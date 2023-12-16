@@ -1,0 +1,17 @@
+{
+  "name": "nlp-qna",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "lodash.trimend": "^4.5.1",
+    "node-nlp": "^3.10.2",
+    "xlsx": "^0.18.5"
+  }
+}
