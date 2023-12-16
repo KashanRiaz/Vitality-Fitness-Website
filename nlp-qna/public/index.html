@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fancy Chatbot UI</title>
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #chat-container {
+            max-width: 600px;
+            margin: 0 auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #chat-box {
+            height: 300px;
+            overflow-y: scroll;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            border: 2px solid #007bff;
+            border-bottom: 0;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .user-message {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        .bot-message {
+            background-color: #28a745;
+            color: #ffffff;
+        }
+
+        #user-input {
+            display: flex;
+            align-items: center;
+            border-top: 2px solid #007bff;
+            padding: 10px;
+            background-color: #ffffff;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        #user-message {
+            flex: 1;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .input-group-append button {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        #instant-answer-panel {
+            margin-top: 20px;
+        }
+
+        .instant-answer-btn {
+            margin-right: 10px;
+            margin-bottom: 10px;
+            border-radius: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .instant-answer-btn:hover {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+<div id="chat-container" class="container">
+    <div id="chat-box" class="bg-light">
+        <!-- Welcome message -->
+        <div class="message bot-message">
+            <strong>Bot:</strong> Welcome! Type a message to start the conversation.
+        </div>
+    </div>
+    <div id="user-input" class="input-group">
+        <input type="text" id="user-message" class="form-control" placeholder="Type your message...">
+        <div class="input-group-append">
+            <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+</div>
+
+<!-- Instant Answer Panel -->
+<div id="instant-answer-panel" class="container">
+    <h5>Common Questions:</h5>
+    <button class="btn btn-secondary instant-answer-btn" onclick="sendInstantAnswer('How can I gain muscle?')">Muscle Gain</button>
+    <button class="btn btn-secondary instant-answer-btn" onclick="sendInstantAnswer('What diet should I follow for home workouts?')">Diet</button>
+    <button class="btn btn-secondary instant-answer-btn" onclick="sendInstantAnswer('How often should I do home workouts?')">Workout Frequency</button>
+    <button class="btn btn-secondary instant-answer-btn" onclick="sendInstantAnswer('Should I take supplements for home workouts?')">Supplements</button>
+</div>
+
+<!-- Bootstrap JS and Popper.js CDN -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.1/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
+
+<!-- Chatbot Logic -->
+<!-- Chatbot Logic -->
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    document.getElementById('user-message').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    function sendMessage() {
+        const userMessage = document.getElementById('user-message').value;
+        appendMessage('You', userMessage, 'user-message');
+        document.getElementById('user-message').value = '';
+
+        // Send the user message to the server and get the response
+        fetch(`/bot?message=${encodeURIComponent(userMessage)}`)
+            .then(response => response.text())
+            .then(botResponse => appendMessage('Bot', botResponse, 'bot-message'))
+            .catch(error => console.error('Error sending message:', error));
+    }
+
+    function sendInstantAnswer(question) {
+        // Display the question being sent
+        appendMessage('You', question, 'user-message');
+
+        // Automatically send the question to the server and get the response
+        fetch(`/bot?message=${encodeURIComponent(question)}`)
+            .then(response => response.text())
+            .then(botResponse => appendMessage('Bot', botResponse, 'bot-message'))
+            .catch(error => console.error('Error sending message:', error));
+    }
+
+    function appendMessage(sender, message, messageType) {
+        const chatBox = document.getElementById('chat-box');
+        const messageDiv = document.createElement('div');
+        messageDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
+        messageDiv.classList.add('message', messageType);
+        chatBox.appendChild(messageDiv);
+
+        // Scroll to the bottom of the chat box
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+</script>
+
+
+</body>
+</html>
